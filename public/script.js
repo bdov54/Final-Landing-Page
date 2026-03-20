@@ -451,21 +451,39 @@ function showToast(message = "Đã thêm vào giỏ hàng") {
 document.getElementById('noshOrderForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    // Kiểm tra giỏ hàng có sản phẩm không
+    const cartEntries = getCartEntries();
+    if (cartEntries.length === 0) {
+        showToast("❌ Vui lòng chọn ít nhất một sản phẩm");
+        return;
+    }
+    
     // Lấy tất cả các vị đã chọn
     const selectedFlavors = Array.from(document.querySelectorAll('input[name="pref"]:checked'))
-                                 .map(el => el.value)
-                                 .join(', ');
+                                 .map(el => el.value);
+    
+    // Kiểm tra vị yêu thích có được chọn không
+    if (selectedFlavors.length === 0) {
+        showToast("❌ Vui lòng chọn ít nhất một hương vị yêu thích");
+        return;
+    }
 
     const formData = {
-        ho: document.getElementById('ho').value,
-        ten: document.getElementById('ten').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
-        preferences: selectedFlavors || "Chưa chọn vị",
+        ho: document.getElementById('ho').value.trim(),
+        ten: document.getElementById('ten').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        preferences: selectedFlavors.join(', '),
         consent_email: document.getElementById('consent_email').checked,
         source: "Website"
     };
+    
+    // Kiểm tra các field bắt buộc
+    if (!formData.ho || !formData.ten || !formData.email || !formData.phone || !formData.address) {
+        showToast("❌ Vui lòng điền đầy đủ thông tin cá nhân");
+        return;
+    }
 
     // Lưu dữ liệu tạm để dùng khi xác nhận
     window._orderData = formData;
@@ -555,38 +573,79 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// HELPER: Submit order to n8n webhook
+async function submitOrder(formData) {
+    const payload = {
+        ho: formData.ho,
+        ten: formData.ten,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        preferences: formData.preferences,
+        consent_email: formData.consent_email ? "Yes" : "No",
+        order_summary: buildOrderSummary(),
+        order_total: String(getCartTotal()),
+        order_item_count: String(getCartCount()),
+        source: "final-landing-page"
+    };
+
+    console.log("📤 Gửi data tới n8n webhook:", payload);
+
+    try {
+        const res = await fetch("https://bdat54.app.n8n.cloud/webhook/3f539418-3c33-479a-912d-ed37010a1e66", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log("📡 Webhook response status:", res.status);
+        console.log("📡 Webhook response ok:", res.ok);
+
+        if (!res.ok) {
+            console.error("❌ Webhook error:", res.status, res.statusText);
+            throw new Error(`Webhook error: ${res.status} ${res.statusText}`);
+        }
+
+        const data = await res.json().catch(() => ({}));
+        console.log("✅ Webhook response data:", data);
+        showToast("✅ Đơn hàng đã được gửi thành công!");
+        return data;
+        
+    } catch (err) {
+        console.error("❌ Lỗi khi gửi đơn hàng:", err.message);
+        showToast("⚠️ Có lỗi khi gửi đơn, vui lòng thử lại");
+        throw err;
+    }
+}
+
 // STEP 3: Xác nhận & submit order
 document.addEventListener('click', async function(e) {
     if (e.target.id === 'confirmBtn') {
+        console.log("🔵 Nút confirm được click");
+        
         const formData = window._orderData;
-        if (!formData) return;
+        if (!formData) {
+            console.error("❌ Không có formData");
+            return;
+        }
+        
+        console.log("📝 Form data:", formData);
         
         try {
-            // Gọi API để lưu order
-            const response = await fetch('/api/save-order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    order_summary: buildOrderSummary(),
-                    order_total: String(getCartTotal()),
-                    order_item_count: String(getCartCount())
-                })
-            }).catch(err => {
-                console.warn("API call failed, but continuing with UI update:", err);
-                return null;
-            });
-            
-            // Hiện thank you screen bất kỳ (cho dù API thành công hay không)
-            showThankYouScreen(formData);
+            // Gọi n8n webhook để lưu order
+            console.log("⏳ Đang gửi đơn hàng tới webhook...");
+            await submitOrder(formData);
+            console.log("✅ Gửi webhook thành công");
             
         } catch (err) {
-            console.error("Lỗi:", err);
-            // Vẫn hiện thank you screen
-            showThankYouScreen(formData);
+            console.error("❌ Lỗi khi gửi đơn hàng:", err);
         }
+        
+        // Hiện thank you screen bất kỳ (cho dù API thành công hay không)
+        console.log("🎉 Hiện thank you screen");
+        showThankYouScreen(formData);
     }
 });
 

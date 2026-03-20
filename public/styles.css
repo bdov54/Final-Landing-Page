@@ -1085,6 +1085,11 @@ input:focus, select:focus { border-color: var(--orange); background: #fff; box-s
     50% { transform: translateY(-10px); }
 }
 
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 .thankYouScreen__title {
     font-size: 32px;
     font-weight: 800;
@@ -1109,4 +1114,16 @@ input:focus, select:focus { border-color: var(--orange); background: #fff; box-s
 
 .thankYouScreen__actions {
     margin-top: 24px;
+}
+
+/* Cart Empty State - Large Warning */
+#cartEmpty.cartEmpty {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #fff1eb 0%, #ffe8dc 100%) !important;
+    border: 2px solid var(--orange) !important;
+    color: var(--orange) !important;
+    padding: 20px 16px !important;
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
 }
