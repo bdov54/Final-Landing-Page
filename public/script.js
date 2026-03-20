@@ -1,4 +1,4 @@
-/* NoshProject - clean script with mini cart + HubSpot sync */
+/* NoshProject - clean script with mini cart + HubSpot sync + n8n webhook */
 
 (() => {
   "use strict";
@@ -6,12 +6,14 @@
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
+  const N8N_WEBHOOK_URL =
+    "https://bdat54.app.n8n.cloud/webhook-test/3f539418-3c33-479a-912d-ed37010a1e66";
+
   /* =========================================================
      1) HUBSPOT FORM INSTANCE
      ========================================================= */
   let hsFormInstance = null;
 
-  // Nên đặt script.js load trước HubSpot embed để bắt được event này chắc chắn hơn
   window.addEventListener("hs-form-event:on-ready", (event) => {
     try {
       if (window.HubSpotFormsV4) {
@@ -24,103 +26,103 @@
   });
 
   window.addEventListener("hs-form-event:on-submission:success", async (event) => {
-  try {
-    if (!window.HubSpotFormsV4) return;
+    try {
+      if (!window.HubSpotFormsV4) return;
 
-    const form = HubSpotFormsV4.getFormFromEvent(event);
-    const values = await form.getFormFieldValues();
+      const form = HubSpotFormsV4.getFormFromEvent(event);
+      const values = await form.getFormFieldValues();
 
-    const normalized = {};
+      const normalized = {};
 
-    values.forEach((item) => {
-      const cleanName = item.name.split("/").pop();
-      normalized[cleanName] = item.value;
-    });
+      values.forEach((item) => {
+        const cleanName = item.name.split("/").pop();
+        normalized[cleanName] = item.value;
+      });
 
-    let customerTaste = normalized.vigoi_san_pham_a_chon || "";
+      let customerTaste = normalized.vigoi_san_pham_a_chon || "";
 
-    if (Array.isArray(customerTaste)) {
-      customerTaste = customerTaste.join(", ");
+      if (Array.isArray(customerTaste)) {
+        customerTaste = customerTaste.join(", ");
+      }
+
+      const payload = {
+        firstname: normalized.firstname || "",
+        lastname: normalized.lastname || "",
+        email: normalized.email || "",
+        phone: normalized.phone || "",
+        address: normalized.address || "",
+        customer_taste: customerTaste,
+        voucher_code: normalized.voucher_code || "",
+        order_summary: normalized.order_summary || buildOrderSummary(),
+        order_total: normalized.order_total || String(getCartTotal()),
+        order_item_count: normalized.order_item_count || String(getCartCount())
+      };
+
+      const resp = await fetch("/api/save-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) {
+        console.error("Lưu đơn vào backend/Knack thất bại");
+        return;
+      }
+
+      cart = {};
+      saveCart();
+      renderCart();
+
+      if (typeof window.showToast === "function") {
+        window.showToast("Đã ghi nhận đơn hàng");
+      }
+    } catch (err) {
+      console.error("Lỗi khi gửi đơn sang backend:", err);
     }
-
-    const payload = {
-      firstname: normalized.firstname || "",
-      lastname: normalized.lastname || "",
-      email: normalized.email || "",
-      phone: normalized.phone || "",
-      address: normalized.address || "",
-      customer_taste: customerTaste,
-      voucher_code: normalized.voucher_code || "",
-      order_summary: normalized.order_summary || buildOrderSummary(),
-      order_total: normalized.order_total || String(getCartTotal()),
-      order_item_count: normalized.order_item_count || String(getCartCount())
-    };
-
-    const resp = await fetch("/api/save-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!resp.ok) {
-      console.error("Lưu đơn vào backend/Knack thất bại");
-      return;
-    }
-
-    cart = {};
-    saveCart();
-    renderCart();
-
-    if (typeof showToast === "function") {
-      showToast("Đã ghi nhận đơn hàng");
-    }
-  } catch (err) {
-    console.error("Lỗi khi gửi đơn sang backend:", err);
-  }
-});
+  });
 
   /* =========================================================
      2) PRODUCTS + MINI CART
      ========================================================= */
- const PRODUCTS = {
-  Trial: {
-    id: "Trial",
-    name: "Túi Dùng Thử",
-    price: 25000
-  },
-  Combo: {
-    id: "Combo",
-    name: "Combo “Ghiền Busan”",
-    price: 110000
-  },
-  Box: {
-    id: "Box",
-    name: "Thùng “Tiệc Văn Phòng”",
-    price: 400000
-  },
-  Spicy: {
-    id: "Spicy",
-    name: "Jagalchi vị Spicy",
-    price: 25000
-  },
-  Peanut: {
-    id: "Peanut",
-    name: "Jagalchi vị Peanut",
-    price: 25000
-  },
-  BrownRice: {
-    id: "BrownRice",
-    name: "Jagalchi vị Brown Rice",
-    price: 25000
-  },
-  Chocolate: {
-    id: "Chocolate",
-    name: "Jagalchi vị Chocolate",
-    price: 25000
-  }
-};
+  const PRODUCTS = {
+    Trial: {
+      id: "Trial",
+      name: "Túi Dùng Thử",
+      price: 25000
+    },
+    Combo: {
+      id: "Combo",
+      name: "Combo “Ghiền Busan”",
+      price: 110000
+    },
+    Box: {
+      id: "Box",
+      name: "Thùng “Tiệc Văn Phòng”",
+      price: 400000
+    },
+    Spicy: {
+      id: "Spicy",
+      name: "Jagalchi vị Spicy",
+      price: 25000
+    },
+    Peanut: {
+      id: "Peanut",
+      name: "Jagalchi vị Peanut",
+      price: 25000
+    },
+    BrownRice: {
+      id: "BrownRice",
+      name: "Jagalchi vị Brown Rice",
+      price: 25000
+    },
+    Chocolate: {
+      id: "Chocolate",
+      name: "Jagalchi vị Chocolate",
+      price: 25000
+    }
+  };
 
   const CART_STORAGE_KEY = "noshproject-mini-cart";
   let cart = loadCart();
@@ -220,7 +222,6 @@
     const total = String(getCartTotal());
     const count = String(getCartCount());
 
-    // Cách 1: dùng HubSpot Forms V4 API
     if (hsFormInstance && typeof hsFormInstance.setFieldValue === "function") {
       try {
         hsFormInstance.setFieldValue("order_summary", summary);
@@ -231,7 +232,6 @@
       }
     }
 
-    // Cách 2: fallback nếu hidden input xuất hiện trực tiếp trong DOM
     const summaryInput = $('input[name="order_summary"]');
     const totalInput = $('input[name="order_total"]');
     const countInput = $('input[name="order_item_count"]');
@@ -262,31 +262,33 @@
 
     cartEmpty.style.display = "none";
 
-    cartList.innerHTML = entries.map(([id, qty]) => {
-      const product = PRODUCTS[id];
-      const lineTotal = product.price * qty;
+    cartList.innerHTML = entries
+      .map(([id, qty]) => {
+        const product = PRODUCTS[id];
+        const lineTotal = product.price * qty;
 
-      return `
-        <div class="cartItem">
-          <div class="cartItem__top">
-            <div>
-              <div class="cartItem__name">${product.name}</div>
-              <div class="cartItem__price">${formatPrice(product.price)} / gói</div>
+        return `
+          <div class="cartItem">
+            <div class="cartItem__top">
+              <div>
+                <div class="cartItem__name">${product.name}</div>
+                <div class="cartItem__price">${formatPrice(product.price)} / gói</div>
+              </div>
+              <button class="cartRemove" type="button" data-action="remove" data-product="${id}">
+                Xóa
+              </button>
             </div>
-            <button class="cartRemove" type="button" data-action="remove" data-product="${id}">
-              Xóa
-            </button>
-          </div>
 
-          <div class="cartQty">
-            <button type="button" data-action="decrease" data-product="${id}">−</button>
-            <b>${qty}</b>
-            <button type="button" data-action="increase" data-product="${id}">+</button>
-            <span style="margin-left:auto;font-weight:800;">${formatPrice(lineTotal)}</span>
+            <div class="cartQty">
+              <button type="button" data-action="decrease" data-product="${id}">−</button>
+              <b>${qty}</b>
+              <button type="button" data-action="increase" data-product="${id}">+</button>
+              <span style="margin-left:auto;font-weight:800;">${formatPrice(lineTotal)}</span>
+            </div>
           </div>
-        </div>
-      `;
-    }).join("");
+        `;
+      })
+      .join("");
 
     cartCount.textContent = String(getCartCount());
     cartTotal.textContent = formatPrice(getCartTotal());
@@ -333,8 +335,12 @@
     const countdownSticky = $("#countdownSticky");
 
     function formatTime(totalSeconds) {
-      const mins = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
-      const secs = Math.floor(totalSeconds % 60).toString().padStart(2, "0");
+      const mins = Math.floor(totalSeconds / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = Math.floor(totalSeconds % 60)
+        .toString()
+        .padStart(2, "0");
       return `${mins}:${secs}`;
     }
 
@@ -356,7 +362,6 @@
       seconds = Math.max(0, seconds - 1);
       tick += 1;
 
-      // Cứ khoảng 90 giây giảm 1 suất, nhưng không dưới 7
       if (tick % 90 === 0 && stock > 7) {
         stock -= 1;
       }
@@ -365,42 +370,46 @@
     }, 1000);
 
     /* -------------------------
-       Flavor buttons -> scroll to pricing
-       (để các nút vị không bị vô dụng)
+       Flavor buttons
     ------------------------- */
     $$(".mini").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    showToast("Bạn đang xem hương vị sản phẩm");
-  });
-});
+      btn.addEventListener("click", () => {
+        window.showToast("Bạn đang xem hương vị sản phẩm");
+      });
+    });
+
+    /* -------------------------
+       Global toast
+    ------------------------- */
+    function showToast(message = "Đã thêm vào giỏ hàng") {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
+
+    window.showToast = showToast;
 
     /* -------------------------
        Add to cart buttons
     ------------------------- */
-function showToast(message = "Đã thêm vào giỏ hàng") {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1800);
-}
-  
     $$(".add-to-cart").forEach((btn) => {
-  btn.addEventListener("click", (event) => {
-    event.preventDefault();
-    const productId = btn.dataset.product;
-    addToCart(productId);
-    showToast("Đã thêm sản phẩm vào giỏ hàng");
-  });
-});
+      btn.addEventListener("click", (event) => {
+        event.preventDefault();
+        const productId = btn.dataset.product;
+        addToCart(productId);
+        showToast("Đã thêm sản phẩm vào giỏ hàng");
+      });
+    });
 
     /* -------------------------
-       Cart actions (event delegation)
+       Cart actions
     ------------------------- */
     const cartList = $("#cartList");
     if (cartList) {
@@ -417,18 +426,11 @@ function showToast(message = "Đã thêm vào giỏ hàng") {
       });
     }
 
-    /* -------------------------
-       Optional clear cart button if you add one later
-       <button id="clearCartBtn">Xóa tất cả</button>
-    ------------------------- */
     const clearCartBtn = $("#clearCartBtn");
     if (clearCartBtn) {
       clearCartBtn.addEventListener("click", clearCart);
     }
 
-    /* -------------------------
-       Render initial cart
-    ------------------------- */
     renderCart();
   }
 
@@ -438,7 +440,6 @@ function showToast(message = "Đã thêm vào giỏ hàng") {
     init();
   }
 
-  // Export functions to global scope for multi-step form
   window.getCartEntries = getCartEntries;
   window.getCartCount = getCartCount;
   window.getCartTotal = getCartTotal;
@@ -448,233 +449,339 @@ function showToast(message = "Đã thêm vào giỏ hàng") {
   window.formatPrice = formatPrice;
 })();
 
-document.getElementById('noshOrderForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+/* =========================================================
+   4) ORDER FLOW OUTSIDE IIFE
+   ========================================================= */
+
+function getSafeCartEntries() {
+  return typeof window.getCartEntries === "function" ? window.getCartEntries() : [];
+}
+
+function getSafeCartCount() {
+  return typeof window.getCartCount === "function" ? window.getCartCount() : 0;
+}
+
+function getSafeCartTotal() {
+  return typeof window.getCartTotal === "function" ? window.getCartTotal() : 0;
+}
+
+function buildSafeOrderSummary() {
+  return typeof window.buildOrderSummary === "function" ? window.buildOrderSummary() : "";
+}
+
+function formatSafePrice(value) {
+  return typeof window.formatPrice === "function"
+    ? window.formatPrice(value)
+    : Number(value || 0).toLocaleString("vi-VN") + "đ";
+}
+
+async function postJson(url, payload, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    const text = await res.text().catch(() => "");
+    let data = {};
     
-    // Kiểm tra giỏ hàng có sản phẩm không
-    const cartEntries = getCartEntries();
-    if (cartEntries.length === 0) {
-        showToast("❌ Vui lòng chọn ít nhất một sản phẩm");
-        return;
+    // Safely parse JSON
+    if (text && text.trim()) {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.warn("⚠️ JSON parse error. Raw response:", text.substring(0, 200));
+        data = { raw: text };
+      }
     }
-    
-    // Lấy tất cả các vị đã chọn
-    const selectedFlavors = Array.from(document.querySelectorAll('input[name="pref"]:checked'))
-                                 .map(el => el.value);
-    
-    // Kiểm tra vị yêu thích có được chọn không
+
+    if (!res.ok) {
+      console.error(`❌ HTTP Error ${res.status}: ${res.statusText}. Response:`, text.substring(0, 500));
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    return data;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function sendOrderToN8N(payload) {
+  console.log("📤 Gửi data tới n8n:", payload);
+  return postJson(N8N_WEBHOOK_URL, payload, 20000);
+}
+
+// HELPER: Submit order to backend + n8n
+async function submitOrder(formData, retryCount = 0) {
+  const payload = {
+    ho: formData.ho,
+    ten: formData.ten,
+    email: formData.email,
+    phone: formData.phone,
+    address: formData.address,
+    preferences: formData.preferences,
+    consent_email: formData.consent_email ? "Yes" : "No",
+    order_summary: buildSafeOrderSummary(),
+    order_total: String(getSafeCartTotal()),
+    order_item_count: String(getSafeCartCount()),
+    source: "final-landing-page"
+  };
+
+  console.log(`📤 Gửi data (attempt ${retryCount + 1}/3):`, payload);
+
+  try {
+    const results = await Promise.allSettled([
+      postJson("/api/save-order", payload, 15000),
+      sendOrderToN8N(payload)
+    ]);
+
+    const backendResult = results[0];
+    const n8nResult = results[1];
+
+    console.log("📡 Backend result:", backendResult);
+    console.log("📡 n8n result:", n8nResult);
+
+    const hasSuccess =
+      backendResult.status === "fulfilled" || n8nResult.status === "fulfilled";
+
+    if (!hasSuccess) {
+      throw new Error("Cả backend và n8n đều thất bại");
+    }
+
+    if (typeof window.showToast === "function") {
+      window.showToast("✅ Đơn hàng đã được gửi thành công!");
+    }
+
+    return {
+      backend:
+        backendResult.status === "fulfilled" ? backendResult.value : null,
+      n8n:
+        n8nResult.status === "fulfilled" ? n8nResult.value : null
+    };
+  } catch (err) {
+    console.error(`❌ Attempt ${retryCount + 1} failed:`, err.message);
+
+    if (
+      retryCount < 2 &&
+      (err.message.includes("Failed to fetch") || err.name === "AbortError")
+    ) {
+      console.log("⏳ Retrying in 1 second...");
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return submitOrder(formData, retryCount + 1);
+    }
+
+    if (typeof window.showToast === "function") {
+      window.showToast("⚠️ Lỗi khi gửi đơn hàng. Vui lòng thử lại");
+    }
+
+    throw err;
+  }
+}
+
+// STEP 1: Submit form -> validate -> show confirmation
+function bindOrderForm() {
+  const orderForm = document.getElementById("noshOrderForm");
+  if (!orderForm) return;
+
+  orderForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const cartEntries = getSafeCartEntries();
+    if (cartEntries.length === 0) {
+      if (typeof window.showToast === "function") {
+        window.showToast("❌ Vui lòng chọn ít nhất một sản phẩm");
+      }
+      return;
+    }
+
+    const selectedFlavors = Array.from(
+      document.querySelectorAll('input[name="pref"]:checked')
+    ).map((el) => el.value);
+
     if (selectedFlavors.length === 0) {
-        showToast("❌ Vui lòng chọn ít nhất một hương vị yêu thích");
-        return;
+      if (typeof window.showToast === "function") {
+        window.showToast("❌ Vui lòng chọn ít nhất một hương vị yêu thích");
+      }
+      return;
     }
 
     const formData = {
-        ho: document.getElementById('ho').value.trim(),
-        ten: document.getElementById('ten').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        address: document.getElementById('address').value.trim(),
-        preferences: selectedFlavors.join(', '),
-        consent_email: document.getElementById('consent_email').checked,
-        source: "Website"
+      ho: document.getElementById("ho")?.value.trim() || "",
+      ten: document.getElementById("ten")?.value.trim() || "",
+      email: document.getElementById("email")?.value.trim() || "",
+      phone: document.getElementById("phone")?.value.trim() || "",
+      address: document.getElementById("address")?.value.trim() || "",
+      preferences: selectedFlavors.join(", "),
+      consent_email: document.getElementById("consent_email")?.checked || false,
+      source: "Website"
     };
-    
-    // Kiểm tra các field bắt buộc
-    if (!formData.ho || !formData.ten || !formData.email || !formData.phone || !formData.address) {
-        showToast("❌ Vui lòng điền đầy đủ thông tin cá nhân");
-        return;
+
+    if (
+      !formData.ho ||
+      !formData.ten ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.address
+    ) {
+      if (typeof window.showToast === "function") {
+        window.showToast("❌ Vui lòng điền đầy đủ thông tin cá nhân");
+      }
+      return;
     }
 
-    // Lưu dữ liệu tạm để dùng khi xác nhận
     window._orderData = formData;
-    
-    // Hiện confirmation screen
     showConfirmationScreen(formData);
-});
+  });
+}
 
 // STEP 2: Hiện màn hình xác nhận
 function showConfirmationScreen(formData) {
-    const form = document.getElementById('noshOrderForm');
-    const confirmationScreen = document.getElementById('confirmationScreen');
-    
-    if (!form || !confirmationScreen) return;
-    
-    // Ẩn form, hiện confirmation screen
-    form.style.display = 'none';
-    confirmationScreen.style.display = 'block';
-    
-    // Điền thông tin khách hàng
-    const customerInfo = document.getElementById('confirmCustomerInfo');
-    if (customerInfo) {
-        customerInfo.innerHTML = `
-            <div><strong>Họ & tên:</strong> ${formData.ho} ${formData.ten}</div>
-            <div><strong>Email:</strong> ${formData.email}</div>
-            <div><strong>Số điện thoại:</strong> ${formData.phone}</div>
-            <div><strong>Địa chỉ giao hàng:</strong> ${formData.address}</div>
-        `;
+  const form = document.getElementById("noshOrderForm");
+  const confirmationScreen = document.getElementById("confirmationScreen");
+
+  if (!form || !confirmationScreen) return;
+
+  form.style.display = "none";
+  confirmationScreen.style.display = "block";
+
+  const customerInfo = document.getElementById("confirmCustomerInfo");
+  if (customerInfo) {
+    customerInfo.innerHTML = `
+      <div><strong>Họ & tên:</strong> ${formData.ho} ${formData.ten}</div>
+      <div><strong>Email:</strong> ${formData.email}</div>
+      <div><strong>Số điện thoại:</strong> ${formData.phone}</div>
+      <div><strong>Địa chỉ giao hàng:</strong> ${formData.address}</div>
+    `;
+  }
+
+  const confirmOrderItems = document.getElementById("confirmOrderItems");
+  if (confirmOrderItems) {
+    const entries = getSafeCartEntries();
+    if (entries.length > 0) {
+      confirmOrderItems.innerHTML = entries
+        .map(([id, qty]) => {
+          const product = window.PRODUCTS[id];
+          const lineTotal = product.price * qty;
+          return `<div>${product.name} x${qty} <span>${formatSafePrice(lineTotal)}</span></div>`;
+        })
+        .join("");
+    } else {
+      confirmOrderItems.innerHTML = "<div>Không có sản phẩm nào</div>";
     }
-    
-    // Điền danh sách sản phẩm từ cart
-    const confirmOrderItems = document.getElementById('confirmOrderItems');
-    if (confirmOrderItems) {
-        const entries = getCartEntries();
-        if (entries.length > 0) {
-            confirmOrderItems.innerHTML = entries.map(([id, qty]) => {
-                const product = PRODUCTS[id];
-                const lineTotal = product.price * qty;
-                return `<div>${product.name} x${qty} <span>${formatPrice(lineTotal)}</span></div>`;
-            }).join('');
-        } else {
-            confirmOrderItems.innerHTML = '<div>Không có sản phẩm nào</div>';
-        }
-    }
-    
-    // Điền tổng cộng
-    const confirmOrderTotal = document.getElementById('confirmOrderTotal');
-    if (confirmOrderTotal) {
-        const total = getCartTotal();
-        confirmOrderTotal.innerHTML = `<div style="font-size: 18px; font-weight: 700;"><span style="color: var(--orange);">${formatPrice(total)}</span></div>`;
-    }
-    
-    // Điền hương vị yêu thích
-    const confirmFlavors = document.getElementById('confirmFlavors');
-    if (confirmFlavors) {
-        const flavorsText = formData.preferences || "Chưa chọn vị";
-        confirmFlavors.innerHTML = `<div>${flavorsText}</div>`;
-    }
-    
-    // Scroll to confirmation screen
-    confirmationScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  const confirmOrderTotal = document.getElementById("confirmOrderTotal");
+  if (confirmOrderTotal) {
+    const total = getSafeCartTotal();
+    confirmOrderTotal.innerHTML = `<div style="font-size: 18px; font-weight: 700;"><span style="color: var(--orange);">${formatSafePrice(
+      total
+    )}</span></div>`;
+  }
+
+  const confirmFlavors = document.getElementById("confirmFlavors");
+  if (confirmFlavors) {
+    const flavorsText = formData.preferences || "Chưa chọn vị";
+    confirmFlavors.innerHTML = `<div>${flavorsText}</div>`;
+  }
+
+  confirmationScreen.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// STEP 2.5: Quay lại form
-document.addEventListener('click', function(e) {
-    if (e.target.id === 'backBtn') {
-        const form = document.getElementById('noshOrderForm');
-        const confirmationScreen = document.getElementById('confirmationScreen');
-        
-        if (form && confirmationScreen) {
-            confirmationScreen.style.display = 'none';
-            form.style.display = 'block';
-            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+// STEP 2.5 + STEP 3
+function bindGlobalClicks() {
+  document.addEventListener("click", async function (e) {
+    if (e.target.id === "backBtn") {
+      const form = document.getElementById("noshOrderForm");
+      const confirmationScreen = document.getElementById("confirmationScreen");
+
+      if (form && confirmationScreen) {
+        confirmationScreen.style.display = "none";
+        form.style.display = "block";
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
-    
-    if (e.target.id === 'continueShoppingBtn') {
-        const form = document.getElementById('noshOrderForm');
-        const thankYouScreen = document.getElementById('thankYouScreen');
-        
-        if (form && thankYouScreen) {
-            thankYouScreen.style.display = 'none';
-            form.style.display = 'block';
-            form.reset();
-            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+
+    if (e.target.id === "continueShoppingBtn") {
+      const form = document.getElementById("noshOrderForm");
+      const thankYouScreen = document.getElementById("thankYouScreen");
+
+      if (form && thankYouScreen) {
+        thankYouScreen.style.display = "none";
+        form.style.display = "block";
+        form.reset();
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
-});
 
-// HELPER: Submit order to n8n webhook
-async function submitOrder(formData) {
-    const payload = {
-        ho: formData.ho,
-        ten: formData.ten,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        preferences: formData.preferences,
-        consent_email: formData.consent_email ? "Yes" : "No",
-        order_summary: buildOrderSummary(),
-        order_total: String(getCartTotal()),
-        order_item_count: String(getCartCount()),
-        source: "final-landing-page"
-    };
+    if (e.target.id === "confirmBtn") {
+      console.log("🔵 Nút confirm được click");
 
-    console.log("📤 Gửi data tới n8n webhook:", payload);
+      const formData = window._orderData;
+      if (!formData) {
+        console.error("❌ Không có formData");
+        return;
+      }
 
-    try {
-        const res = await fetch("https://bdat54.app.n8n.cloud/webhook/3f539418-3c33-479a-912d-ed37010a1e66", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
+      console.log("📝 Form data:", formData);
 
-        console.log("📡 Webhook response status:", res.status);
-        console.log("📡 Webhook response ok:", res.ok);
+      try {
+        console.log("⏳ Đang gửi đơn hàng tới backend + n8n...");
+        await submitOrder(formData);
+        console.log("✅ Gửi đơn hàng thành công");
+      } catch (err) {
+        console.error("❌ Lỗi khi gửi đơn hàng:", err);
+      }
 
-        if (!res.ok) {
-            console.error("❌ Webhook error:", res.status, res.statusText);
-            throw new Error(`Webhook error: ${res.status} ${res.statusText}`);
-        }
-
-        const data = await res.json().catch(() => ({}));
-        console.log("✅ Webhook response data:", data);
-        showToast("✅ Đơn hàng đã được gửi thành công!");
-        return data;
-        
-    } catch (err) {
-        console.error("❌ Lỗi khi gửi đơn hàng:", err.message);
-        showToast("⚠️ Có lỗi khi gửi đơn, vui lòng thử lại");
-        throw err;
+      console.log("🎉 Hiện thank you screen");
+      showThankYouScreen(formData);
     }
+  });
 }
-
-// STEP 3: Xác nhận & submit order
-document.addEventListener('click', async function(e) {
-    if (e.target.id === 'confirmBtn') {
-        console.log("🔵 Nút confirm được click");
-        
-        const formData = window._orderData;
-        if (!formData) {
-            console.error("❌ Không có formData");
-            return;
-        }
-        
-        console.log("📝 Form data:", formData);
-        
-        try {
-            // Gọi n8n webhook để lưu order
-            console.log("⏳ Đang gửi đơn hàng tới webhook...");
-            await submitOrder(formData);
-            console.log("✅ Gửi webhook thành công");
-            
-        } catch (err) {
-            console.error("❌ Lỗi khi gửi đơn hàng:", err);
-        }
-        
-        // Hiện thank you screen bất kỳ (cho dù API thành công hay không)
-        console.log("🎉 Hiện thank you screen");
-        showThankYouScreen(formData);
-    }
-});
 
 // STEP 4: Hiện màn hình cảm ơn
 function showThankYouScreen(formData) {
-    const confirmationScreen = document.getElementById('confirmationScreen');
-    const thankYouScreen = document.getElementById('thankYouScreen');
-    const thankYouOrderNumber = document.getElementById('thankYouOrderNumber');
-    
-    if (!confirmationScreen || !thankYouScreen) return;
-    
-    // Ẩn confirmation, hiện thank you
-    confirmationScreen.style.display = 'none';
-    thankYouScreen.style.display = 'block';
-    
-    // Generate order number
-    const orderNumber = 'JAGAL' + Date.now().toString().slice(-8);
-    
-    if (thankYouOrderNumber) {
-        thankYouOrderNumber.innerHTML = `
-            <strong style="font-size: 14px; color: var(--muted);">Mã đơn hàng:</strong>
-            <span style="font-family: monospace; font-weight: 700; color: var(--orange); font-size: 14px;">${orderNumber}</span>
-        `;
-    }
-    
-    // Clear cart & form
-    clearCart();
-    document.getElementById('noshOrderForm').reset();
-    
-    // Scroll to thank you
-    thankYouScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const confirmationScreen = document.getElementById("confirmationScreen");
+  const thankYouScreen = document.getElementById("thankYouScreen");
+  const thankYouOrderNumber = document.getElementById("thankYouOrderNumber");
+
+  if (!confirmationScreen || !thankYouScreen) return;
+
+  confirmationScreen.style.display = "none";
+  thankYouScreen.style.display = "block";
+
+  const orderNumber = "JAGAL" + Date.now().toString().slice(-8);
+
+  if (thankYouOrderNumber) {
+    thankYouOrderNumber.innerHTML = `
+      <strong style="font-size: 14px; color: var(--muted);">Mã đơn hàng:</strong>
+      <span style="font-family: monospace; font-weight: 700; color: var(--orange); font-size: 14px;">${orderNumber}</span>
+    `;
+  }
+
+  if (typeof window.clearCart === "function") {
+    window.clearCart();
+  }
+
+  const form = document.getElementById("noshOrderForm");
+  if (form) form.reset();
+
+  thankYouScreen.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    bindOrderForm();
+    bindGlobalClicks();
+  });
+} else {
+  bindOrderForm();
+  bindGlobalClicks();
 }

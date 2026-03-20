@@ -148,6 +148,55 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+// Webhook endpoint - nhận dữ liệu form từ HubSpot và gửi tới N8N
+app.post("/api/save-order", async (req, res) => {
+  try {
+    const payload = req.body;
+    
+    // Log dữ liệu nhận được
+    console.log("📋 Form data nhận được:", JSON.stringify(payload, null, 2));
+    
+    // Gửi dữ liệu tới N8N webhook
+    const n8nWebhookUrl = "https://bdat54.app.n8n.cloud/webhook-test/3f539418-3c33-479a-912d-ed37010a1e66";
+    
+    try {
+      const n8nResponse = await fetch(n8nWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        timeout: 10000
+      });
+      
+      if (n8nResponse.ok) {
+        const n8nData = await n8nResponse.text();
+        console.log("✅ Dữ liệu đã gửi tới N8N thành công. Response:", n8nData);
+      } else {
+        const errorText = await n8nResponse.text();
+        console.error("⚠️ N8N trả về:", n8nResponse.status, n8nResponse.statusText);
+        console.error("📛 N8N Error body:", errorText);
+        console.error("🔗 Webhook URL:", n8nWebhookUrl);
+      }
+    } catch (n8nError) {
+      console.error("❌ Lỗi khi gửi tới N8N:", n8nError.message);
+      console.error("🔗 Webhook URL:", n8nWebhookUrl);
+    }
+    
+    res.json({ 
+      success: true, 
+      message: "Đã nhận đơn hàng",
+      data: payload 
+    });
+  } catch (error) {
+    console.error("❌ Lỗi khi xử lý đơn:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
