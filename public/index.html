@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NoshProject - Jagalchi Ojimae - Snack Rong Biển Busan</title>
+  <meta name="description"
+    content="Snack rong biển Busan giòn tan, sấy lạnh 0% dầu. Chốt đơn nhanh - ưu đãi 30% hôm nay." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <a class="skip" href="#order">Bỏ qua & đi tới đặt hàng</a>
+
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <div class="topbar__left">
+        <span class="pill pill--hot">🔥 Top Trending</span>
+        <span class="topbar__text">Snack rong biển được yêu thích nhất TikTok tuần qua</span>
+      </div>
+      <div class="topbar__right">
+        <span class="pill pill--stock">⏳ Còn <b id="stockLeft">37</b> suất - kết thúc sau <b
+            id="countdown">15:00</b></span>
+      </div>
+    </div>
+  </div>
+
+  <header class="header" id="top">
+    <div class="container header__inner">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">❤</div>
+        <div class="brand__text">
+          <div class="brand__name">NoshProject</div>
+          <div class="brand__sub">Jagalchi - Seaweed Snack</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Điều hướng">
+        <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+        <div class="nav__menu" id="navMenu">
+          <a href="#features">Điểm nổi bật</a>
+          <a href="#benefits">Vì sao chọn</a>
+          <a href="#process">Quy trình</a>
+          <a href="#products">Hương vị</a>
+          <a href="#pricing">Giá</a>
+          <a href="#trust">Tin tưởng</a>
+          <a class="btn btn--sm btn--primary" href="#order">Mua ngay - giảm 30%</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <div class="hero__chips">
+          <span class="chip">🇰🇷 Tươi mới từ Busan</span>
+          <span class="chip">❄️ Sấy lạnh 0% dầu mỡ</span>
+          <span class="chip">✅ An toàn cho sức khỏe</span>
+        </div>
+
+        <h1 class="hero__title">
+          ĂN VẶT THẢ GA - DÁNG VẪN KIÊU SA:<br />
+          <span class="accent">SNACK RONG BIỂN BUSAN</span> GIÒN TAN, CHỈ <span class="accent">45 CALO</span>!
+        </h1>
+
+        <p class="hero__subtitle">
+          Giải cứu cơn đói xế chiều bằng công nghệ sấy lạnh 0% dầu mỡ. Ăn ngon như ở Busan, nhẹ tênh như đang trên biển.
+          Đã có <b>2.000+</b> Gen Z “ghiền” Jagalchi, còn bạn?
+        </p>
+
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg btn--shake" href="#order">MUA NGAY - GIẢM 30% DUY NHẤT HÔM NAY</a>
+          <a class="btn btn--ghost btn--lg" href="#products">Xem 4 vị hot</a>
+        </div>
+
+        <p class="micro">
+          <span class="dot dot--orange"></span>
+          <b>Chỉ còn <span id="stockInline">37</span> suất</b> ưu đãi 30% cuối cùng trong hôm nay.
+        </p>
+
+        <div class="hero__proof">
+          <div class="stars" aria-label="Đánh giá 4.8 trên 5">★★★★★</div>
+          <div class="hero__rating"><b>4.8/5</b> (KOC & người dùng)</div>
+          <div class="pillrow">
+            <span class="pill">0% dầu</span>
+            <span class="pill">Vegan-friendly</span>
+            <span class="pill">Giòn - nhẹ - ít ngấy</span>
+          </div>
+        </div>
+
+        <div class="hero__quickfacts">
+          <div class="qcard">
+            <div class="qcard__num">45</div>
+            <div class="qcard__lbl">Calo / gói</div>
+          </div>
+          <div class="qcard">
+            <div class="qcard__num">0%</div>
+            <div class="qcard__lbl">Dầu mỡ</div>
+          </div>
+          <div class="qcard">
+            <div class="qcard__num">4</div>
+            <div class="qcard__lbl">Hương vị</div>
+          </div>
+          <div class="qcard">
+            <div class="qcard__num">Clean</div>
+            <div class="qcard__lbl">Tuyệt đối</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <div class="heroCard">
+          <div class="heroCard__bg" aria-hidden="true"></div>
+          <div class="heroCard__imgWrap">
+            <img class="heroCard__pack" src="assets/pack_4_flavors.png" alt="Bộ 4 hương vị Jagalchi" />
+          </div>
+          <img class="heroCard__mascot" src="assets/mascot.png" alt="" aria-hidden="true" />
+
+          <div class="heroCard__float heroCard__float--1">
+            <div class="floatBadge">“RẮC” giòn rụm</div>
+            <div class="floatText">Ăn là nhớ - không cần dầu chiên</div>
+          </div>
+
+
+          <div class="miniRow" aria-label="4 vị chủ lực">
+            <button class="mini" data-flavor="Spicy"><img src="assets/pack_spicy.png"
+                alt="" /><span>Spicy</span></button>
+            <button class="mini" data-flavor="Peanut"><img src="assets/pack_peanut.png"
+                alt="" /><span>Peanut</span></button>
+            <button class="mini" data-flavor="Brown Rice"><img src="assets/pack_original.png" alt="" /><span>Brown
+                Rice</span></button>
+            <button class="mini" data-flavor="Chocolate"><img src="assets/pack_chocolate.png"
+                alt="" /><span>Chocolate</span></button>
+          </div>
+        </div>
+
+        <div class="heroSide">
+          <div class="speech">
+            <div class="speech__bubble">“Dù cho ở khắp ba miền. Lấy ngay một gói Jagalchi là vui liền!”</div>
+            <div class="speech__who">- Bà cô Busan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white tvc" id="tvc">
+    <div class="container">
+      <div class="tvc__head">
+        <div>
+          <div class="kicker"><span class="kdot"></span> TVC THƯƠNG HIỆU</div>
+          <h2 class="h2">Khám phá cùng Bà cô Busan</h2>
+          <p class="sub">
+            Cùng nhau thưởng thức snack ngon giòn từ NoshProject nhé!
+          </p>
+        </div>
+
+        <div class="tvc__actions">
+          <a class="btn btn--primary" href="#order">Chốt đơn ngay</a>
+          <a class="btn btn--ghost" href="#products">Xem 4 vị hot</a>
+        </div>
+      </div>
+
+      <div class="tvc__card">
+        <div class="tvc__videoWrap">
+          <video class="tvc__video" controls playsinline preload="metadata" poster="assets/tvc-poster.jpg">
+            <source src="assets/TVC2.mp4" type="video/mp4" />
+            Trình duyệt của bạn không hỗ trợ video.
+          </video>
+        </div>
+
+        <div class="tvc__meta">
+          <div class="pillrow">
+            <span class="pill">🎬 TVC chính thức</span>
+            <span class="pill">🌊 Cảm hứng Busan</span>
+            <span class="pill">❄️ Sấy lạnh 0% dầu</span>
+          </div>
+
+          <p class="tvc__note">
+
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="features">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> ĐIỂM NỔI BẬT</div>
+      <h2 class="h2">Jalgachi - Ăn là nhớ ngay!</h2>
+
+      <div class="grid3">
+        <article class="fcard">
+          <div class="fcard__top">
+            <div class="sticker sticker--ice">❄️</div>
+            <h3>GIÒN TAN KHÔNG DẦU – DA ĐẸP, DÁNG XINH</h3>
+          </div>
+          <p><b>Công nghệ sấy lạnh</b> giữ trọn độ giòn tự nhiên mà không cần chiên ngập dầu.</p>
+          <div class="fcard__meme">
+            <img src="assets/illu_doiqua.png" alt="Minh hoạ đói quá" />
+            <span>“ĐÓI QUÁ!” → có Jagalchi là hết drama</span>
+          </div>
+        </article>
+
+        <article class="fcard">
+          <div class="fcard__top">
+            <div class="sticker sticker--sea">🌊</div>
+            <h3>TINH HOA BUSAN – VỊ NGON CHUẨN BẢN XỨ</h3>
+          </div>
+          <p>Rong biển được <b>từ vùng biển sạch Busan</b> để có vị ngọt thanh & độ dày vượt trội.</p>
+          <div class="fcard__photo">
+            <img src="assets/Gemini_Generated_Image_pd2wiipd2wiipd2w.png" alt="Chợ hải sản Busan" />
+            <span>“Ngửi cái là thấy Busan!”</span>
+          </div>
+        </article>
+
+        <article class="fcard">
+          <div class="fcard__top">
+            <div class="sticker sticker--clean">🍃</div>
+            <h3>ĂN VẶT TỬ TẾ – “3 KHÔNG” TUYỆT ĐỐI</h3>
+          </div>
+          <p><b>KHÔNG</b> với: Chất bảo quản, Màu nhân tạo, Cholesterol xấu.</p>
+          <div class="fcard__photo">
+            <img src="assets/ceert2.png" alt="Chợ hải sản Busan">
+            <span>Đạt chuẩn quốc tế - Ăn ngon không lo!</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="benefits">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> VÌ SAO CHỌN</div>
+      <h2 class="h2">Tại sao 2.000+ bạn trẻ chọn Jagalchi mỗi ngày?</h2>
+      <p class="sub">Không chỉ “ngon” - mà còn đúng nhu cầu: giữ dáng, giảm stress, và ăn sạch.</p>
+
+      <div class="bgrid">
+        <article class="bcard">
+          <div class="bcard__head">
+            <h3>ĂN THẢ GA, DÁNG VẪN “NUỘT”</h3>
+            <span class="tag tag--orange">Siêu nhẹ calo</span>
+          </div>
+          <p>Mỗi gói chỉ ~<b>45 calo</b>. Giòn tan đã miệng mà không cần “trả giá” bằng 2 tiếng chạy bộ.</p>
+          <div class="bcard__img" style="margin-top: 5px">
+            <img src="assets/vp.png" alt="Minh hoạ ăn vui vẻ" />
+            <div class="caption">Cày phim cực cuốn, làm việc cực hăng.</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="bcard__head">
+            <h3>F5 TINH THẦN TỨC THÌ</h3>
+            <span class="tag tag--sea">Xả stress</span>
+          </div>
+          <p>Deadline căng? Tiếng “rắc” giòn tan, mặn mòi Busan đánh tan mệt mỏi - lấy lại 200% phong độ.</p>
+          <div class="bcard__img" style="margin-top: 5px">
+            <img src="assets/f6.png" alt="Minh hoạ ăn vui vẻ" />
+            <div class="caption">Gió thổi mơn man, đập tan mệt mỏi.</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="bcard__head">
+            <h3>LỰA CHỌN TỬ TẾ</h3>
+            <span class="tag tag--clean">Clean Eating</span>
+          </div>
+          <p>Đừng đánh đổi sức khoẻ lấy snack đầy hương liệu. Jagalchi là cam kết “sạch từ tâm”.</p>
+          <div class="bcard__img" style="margin-top: 5px">
+            <img src="assets/ensure.png" alt="Minh hoạ ăn vui vẻ" />
+            <div class="caption">Ăn ngon thả ga, không lo về giá</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="process">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> QUY TRÌNH</div>
+      <h2 class="h2">Bật mí quy trình tạo nên miếng snack “gây nghiện”</h2>
+      <p class="sub">Đi theo “hành trình” 3 bước - có mũi tên điều hướng để mắt bạn không bị lạc.</p>
+
+      <div class="timeline">
+        <div class="step">
+          <div class="step__num">01</div>
+          <div class="step__body">
+            <h3>Tinh hoa biển sạch Busan</h3>
+            <p>Chọn lá rong biển đạt độ chín hoàn hảo để có độ dày và vị ngọt tự nhiên.</p>
+          </div>
+        </div>
+        <div class="arrow" aria-hidden="true">➜</div>
+        <div class="step">
+          <div class="step__num">02</div>
+          <div class="step__body">
+            <h3>Sấy lạnh “khóa vị”</h3>
+            <p>Không chiên dầu. Sấy lạnh giúp “khóa” dưỡng chất và tạo tiếng giòn “rắc rắc”.</p>
+          </div>
+        </div>
+        <div class="arrow" aria-hidden="true">➜</div>
+        <div class="step">
+          <div class="step__num">03</div>
+          <div class="step__body">
+            <h3>Tươi ngon như "ra lò"</h3>
+            <p>Đóng gói khắt khe. Mở túi là thơm - như đang đứng giữa chợ hải sản Busan.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="story">
+        <div class="story__left">
+          <h3>Mang “linh hồn” Busan về Việt Nam</h3>
+          <p>Đội ngũ đã dành hơn <b>12 tháng</b> nghiên cứu để vừa giữ tinh hoa Hàn Quốc, vừa hợp khẩu vị Việt.</p>
+          <div class="pillrow mt-3">
+            <span class="pill">Premium Quality</span>
+            <span class="pill">Giá “hạt dẻ”</span>
+          </div>
+        </div>
+
+        <div class="story__right">
+          <div class="routeCard">
+            <div class="routeCard__top">
+              <div class="routeCard__title">Từ Busan đến tay bạn</div>
+              <img src="assets/mascot.png" class="routeCard__mascot" alt="" />
+            </div>
+            <svg class="routeSvg" viewBox="0 0 520 220">
+              <defs>
+                <linearGradient id="sea" x1="0" x2="1">
+                  <stop offset="0" stop-color="#CFEAFF" />
+                  <stop offset="1" stop-color="#FFF1DD" />
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="520" height="220" fill="url(#sea)" rx="18"></rect>
+              <path
+                d="M0 160 C60 150 80 170 140 160 C200 150 220 170 280 160 C340 150 360 170 420 160 C470 150 490 170 520 160"
+                fill="none" stroke="rgba(15,39,71,.15)" stroke-width="3" />
+              <path d="M140 150 C220 90 300 95 410 70" fill="none" stroke="#FF6A2B" stroke-width="4"
+                stroke-dasharray="8 8" stroke-linecap="round" />
+              <circle cx="140" cy="150" r="10" fill="#0F2747" />
+              <circle cx="140" cy="150" r="5" fill="#fff" />
+              <text x="112" y="190" font-size="16" fill="#0F2747" font-weight="bold">Việt Nam</text>
+              <circle cx="410" cy="70" r="10" fill="#0F2747" />
+              <circle cx="410" cy="70" r="5" fill="#fff" />
+              <text x="386" y="55" font-size="16" fill="#0F2747" font-weight="bold">Busan</text>
+              <path d="M255 120 l20 0 l-6 10 h-28 z" fill="#0F2747" opacity=".85" />
+              <path d="M255 120 l0 -20 l12 10 z" fill="#0F2747" opacity=".85" />
+            </svg>
+            <div class="routeCard__quote">“We make your breaks fun and flavorful.”</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="products">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> HƯƠNG VỊ</div>
+      <h2 class="h2">Vị yêu thích của bạn là gì?</h2>
+
+      <div class="pgrid">
+        <article class="pcard">
+          <div class="pcard__img"><img src="assets/pack_spicy.png" alt="Vị Spicy" /></div>
+          <div class="pcard__content">
+            <h3>Spicy</h3>
+            <p>Bùng nổ vị giác - cay tê kích thích, hậu vị ngọt thanh của biển.</p>
+            <button type="button" class="btn btn--ghost add-to-cart mt-auto" data-product="Spicy">Thêm vào giỏ</button>
+          </div>
+        </article>
+
+        <article class="pcard">
+          <div class="pcard__img"><img src="assets/pack_peanut.png" alt="Vị Peanut" /></div>
+          <div class="pcard__content">
+            <h3>Peanut</h3>
+            <p>Giòn kép, thơm bùi - “đẩy” năng lượng cho giờ làm việc căng.</p>
+            <button type="button" class="btn btn--ghost add-to-cart mt-auto" data-product="Peanut">Thêm vào giỏ</button>
+          </div>
+        </article>
+
+        <article class="pcard">
+          <div class="pcard__img"><img src="assets/pack_original.png" alt="Vị Brown Rice" /></div>
+          <div class="pcard__content">
+            <h3>Brown Rice</h3>
+            <p>Không đường, cực thấp calo - chuẩn gu Eat Clean.</p>
+            <button type="button" class="btn btn--ghost add-to-cart mt-auto" data-product="BrownRice">Thêm vào
+              giỏ</button>
+          </div>
+        </article>
+
+        <article class="pcard">
+          <div class="pcard__img"><img src="assets/pack_chocolate.png" alt="Vị Chocolate" /></div>
+          <div class="pcard__content">
+            <h3>Chocolate</h3>
+            <p>Mặn nhẹ + socola đen đắng ngọt tinh tế - lạ mà cuốn.</p>
+            <button type="button" class="btn btn--ghost add-to-cart mt-auto" data-product="Chocolate">Thêm vào
+              giỏ</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="tip">
+        Tip: Nếu bạn mới thử lần đầu, hãy chọn <b>Combo “Ghiền Busan”</b> để nếm đủ 4 vị - tìm ra chân ái.
+      </div>
+    </div>
+  </section>
+
+  <article class="tcard full-width-card">
+    <h3 style="text-align: center; margin-bottom: 30px;">Chứng nhận chất lượng & An toàn</h3>
+
+    <div class="cert-container">
+      <div class="cert-item">
+        <img src="assets/chung-chi-1.png.png" alt="Chứng chỉ ISO" />
+        <p>Chứng nhận ISO 22000</p>
+      </div>
+      <div class="cert-item">
+        <img src="assets/chung-chi-2.png.png" alt="Chứng chỉ HACCP" />
+        <p>Tiêu chuẩn HACCP</p>
+      </div>
+      <div class="cert-item">
+        <img src="assets/chung-chi-3.png.png" alt="Chứng chỉ FDA" />
+        <p>Chứng nhận FDA Hoa Kỳ</p>
+      </div>
+    </div>
+
+    <div class="marquee mt-auto" id="kocMarquee">
+      <div class="marquee__inner">
+        <span>🔥 100% Nguyên liệu tự nhiên</span>
+        <span>🔥 Quy trình khép kín hiện đại</span>
+        <span>🔥 Đạt chuẩn xuất khẩu quốc tế</span>
+        <span>🔥 Kiểm định định kỳ 6 tháng</span>
+      </div>
+    </div>
+  </article>
+
+  <section class="section section--soft" id="pricing">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> BẢNG GIÁ</div>
+      <h2 class="h2">Chọn gói phù hợp nhất</h2>
+      <p class="sub">Ưu đãi 30% áp dụng hôm nay. Giá sẽ được xác nhận khi đội ngũ gọi lại.</p>
+
+      <div class="priceGrid">
+        <article class="priceCard">
+          <div class="priceCard__top">
+            <h3>Túi Dùng Thử</h3>
+            <span class="miniBadge">Giảm rủi ro</span>
+          </div>
+          <div class="priceImg"><img src="assets/pack_original.png" alt="Túi dùng thử" /></div>
+          <div class="price">
+            <span class="old">25.000đ</span>
+            <span class="now">20.000đ</span>
+          </div>
+          <ul class="ticks">
+            <li>01 gói tuỳ chọn nho nhỏ</li>
+            <li>Để cháu ăn thử cháu nhé</li>
+          </ul>
+          <button type="button" class="btn btn--ghost mt-auto w-100 add-to-cart" data-product="Trial">Chọn gói
+            này</button>
+        </article>
+
+        <article class="priceCard priceCard--best">
+          <div class="ribbon">BÁN CHẠY NHẤT</div>
+          <div class="priceCard__top">
+            <h3>Combo “Ghiền Busan”</h3>
+            <span class="miniBadge miniBadge--best">Khuyên dùng</span>
+          </div>
+          <div class="priceImg"><img src="assets/pack_4_flavors.png" alt="Combo ghiền Busan" /></div>
+          <div class="price">
+            <span class="old">125.000đ</span>
+            <span class="now">110.000đ</span>
+          </div>
+          <ul class="ticks">
+            <li>05 gói (đủ 4 vị + 1 vị best)</li>
+            <li>Tiết kiệm 15% + tặng sticker</li>
+          </ul>
+          <button type="button" class="btn btn--primary btn--lg mt-auto w-100 add-to-cart" data-product="Combo">CHỐT
+            COMBO NGAY!</button>
+        </article>
+
+        <article class="priceCard">
+          <div class="priceCard__top">
+            <h3>Thùng “Tiệc Văn Phòng”</h3>
+            <span class="miniBadge">Mua chung</span>
+          </div>
+          <div class="priceImg"><img src="assets/bag.png" alt="Thùng tiệc" /></div>
+          <div class="price">
+            <span class="old">500.000đ</span>
+            <span class="now">400.000đ</span>
+          </div>
+          <ul class="ticks">
+            <li>20 gói (full các vị)</li>
+            <li>Tiết kiệm 20% + Freeship</li>
+          </ul>
+          <button type="button" class="btn btn--ghost mt-auto w-100 add-to-cart" data-product="Box">Chọn gói
+            này</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="order">
+    <div class="container">
+      <div class="kicker"><span class="kdot"></span> ĐẶT HÀNG</div>
+      <h2 class="h2">Chỉ 30 giây để nhận ưu đãi 30% & quà tặng!</h2>
+      <div class="orderGrid mt-4">
+        <aside class="orderSummary">
+          <h3>Đơn của bạn</h3>
+
+          <div id="cartEmpty" class="sumNote">
+            Chưa có sản phẩm nào trong đơn. Hãy chọn gói ở phần bảng giá bên trên.
+          </div>
+
+          <div id="cartList" class="cartList"></div>
+
+          <div class="cartFooter">
+            <div class="sumRow">
+              <span>Tổng số món</span>
+              <b id="cartCount">0</b>
+            </div>
+            <div class="sumRow">
+              <span>Tạm tính</span>
+              <b id="cartTotal" class="accent text-lg">0đ</b>
+            </div>
+          </div>
+
+          <div class="sumNote mt-3">
+            Tip: Đội ngũ sẽ gọi xác nhận đơn và tư vấn thêm hương vị nếu cần.
+          </div>
+        </aside>
+
+        <div class="orderForm">
+          <script src="https://js-na2.hsforms.net/forms/embed/245434646.js" defer></script>
+          <div class="hs-form-frame" data-region="na2" data-form-id="e2aa2b8a-f0f9-4b0d-823e-226349010082"
+            data-portal-id="245434646"></div>
+        </div>
+      </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <h3 class="footer-title">NoshProject - Thương hiệu Jagalchi Ojimae</h3>
+      <p>Kho: Quận 7, TP. Hồ Chí Minh | Hotline: 0934679448 | Email: doanhnlb23411@st.uel.edu.vn</p>
+      <p class="mt-2 text-sm text-muted">Bản quyền thuộc về NoshProject © 2026. Các hình ảnh minh họa mang tính chất
+        tham khảo.</p>
+    </div>
+  </footer>
+  <div id="toast" class="toast">Đã thêm vào giỏ hàng</div>
+  <button id="chatToggle" class="chatToggle" aria-label="Mở tư vấn viên">💬</button>
+
+  <div id="chatWidget" class="chatWidget chatWidget--hidden">
+    <div class="chatWidget__header">
+      <div>
+        <div class="chatWidget__title">Tư vấn nhanh</div>
+        <div class="chatWidget__sub">Hỏi vị phù hợp, combo, cách chọn nhanh</div>
+      </div>
+      <button id="chatClose" class="chatWidget__close" aria-label="Đóng chat">×</button>
+    </div>
+
+    <div id="chatMessages" class="chatWidget__messages">
+      <div class="chatBubble chatBubble--bot">
+        Xin chào, mình có thể tư vấn vị phù hợp hoặc gợi ý combo cho bạn.
+      </div>
+    </div>
+
+    <form id="chatForm" class="chatWidget__form">
+      <input id="chatInput" class="chatWidget__input" type="text" placeholder="Ví dụ: Mới ăn lần đầu nên chọn vị nào?"
+        autocomplete="off" />
+      <button type="submit" class="chatWidget__send">Gửi</button>
+    </form>
+  </div>
+  <script src="script.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+
+</html>
