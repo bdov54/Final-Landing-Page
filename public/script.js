@@ -437,4 +437,185 @@ function showToast(message = "Đã thêm vào giỏ hàng") {
   } else {
     init();
   }
+
+  // Export functions to global scope for multi-step form
+  window.getCartEntries = getCartEntries;
+  window.getCartCount = getCartCount;
+  window.getCartTotal = getCartTotal;
+  window.buildOrderSummary = buildOrderSummary;
+  window.PRODUCTS = PRODUCTS;
+  window.clearCart = clearCart;
+  window.formatPrice = formatPrice;
 })();
+
+document.getElementById('noshOrderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Lấy tất cả các vị đã chọn
+    const selectedFlavors = Array.from(document.querySelectorAll('input[name="pref"]:checked'))
+                                 .map(el => el.value)
+                                 .join(', ');
+
+    const formData = {
+        ho: document.getElementById('ho').value,
+        ten: document.getElementById('ten').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        preferences: selectedFlavors || "Chưa chọn vị",
+        consent_email: document.getElementById('consent_email').checked,
+        source: "Website"
+    };
+
+    // Lưu dữ liệu tạm để dùng khi xác nhận
+    window._orderData = formData;
+    
+    // Hiện confirmation screen
+    showConfirmationScreen(formData);
+});
+
+// STEP 2: Hiện màn hình xác nhận
+function showConfirmationScreen(formData) {
+    const form = document.getElementById('noshOrderForm');
+    const confirmationScreen = document.getElementById('confirmationScreen');
+    
+    if (!form || !confirmationScreen) return;
+    
+    // Ẩn form, hiện confirmation screen
+    form.style.display = 'none';
+    confirmationScreen.style.display = 'block';
+    
+    // Điền thông tin khách hàng
+    const customerInfo = document.getElementById('confirmCustomerInfo');
+    if (customerInfo) {
+        customerInfo.innerHTML = `
+            <div><strong>Họ & tên:</strong> ${formData.ho} ${formData.ten}</div>
+            <div><strong>Email:</strong> ${formData.email}</div>
+            <div><strong>Số điện thoại:</strong> ${formData.phone}</div>
+            <div><strong>Địa chỉ giao hàng:</strong> ${formData.address}</div>
+        `;
+    }
+    
+    // Điền danh sách sản phẩm từ cart
+    const confirmOrderItems = document.getElementById('confirmOrderItems');
+    if (confirmOrderItems) {
+        const entries = getCartEntries();
+        if (entries.length > 0) {
+            confirmOrderItems.innerHTML = entries.map(([id, qty]) => {
+                const product = PRODUCTS[id];
+                const lineTotal = product.price * qty;
+                return `<div>${product.name} x${qty} <span>${formatPrice(lineTotal)}</span></div>`;
+            }).join('');
+        } else {
+            confirmOrderItems.innerHTML = '<div>Không có sản phẩm nào</div>';
+        }
+    }
+    
+    // Điền tổng cộng
+    const confirmOrderTotal = document.getElementById('confirmOrderTotal');
+    if (confirmOrderTotal) {
+        const total = getCartTotal();
+        confirmOrderTotal.innerHTML = `<div style="font-size: 18px; font-weight: 700;"><span style="color: var(--orange);">${formatPrice(total)}</span></div>`;
+    }
+    
+    // Điền hương vị yêu thích
+    const confirmFlavors = document.getElementById('confirmFlavors');
+    if (confirmFlavors) {
+        const flavorsText = formData.preferences || "Chưa chọn vị";
+        confirmFlavors.innerHTML = `<div>${flavorsText}</div>`;
+    }
+    
+    // Scroll to confirmation screen
+    confirmationScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// STEP 2.5: Quay lại form
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'backBtn') {
+        const form = document.getElementById('noshOrderForm');
+        const confirmationScreen = document.getElementById('confirmationScreen');
+        
+        if (form && confirmationScreen) {
+            confirmationScreen.style.display = 'none';
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    
+    if (e.target.id === 'continueShoppingBtn') {
+        const form = document.getElementById('noshOrderForm');
+        const thankYouScreen = document.getElementById('thankYouScreen');
+        
+        if (form && thankYouScreen) {
+            thankYouScreen.style.display = 'none';
+            form.style.display = 'block';
+            form.reset();
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+});
+
+// STEP 3: Xác nhận & submit order
+document.addEventListener('click', async function(e) {
+    if (e.target.id === 'confirmBtn') {
+        const formData = window._orderData;
+        if (!formData) return;
+        
+        try {
+            // Gọi API để lưu order
+            const response = await fetch('/api/save-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    order_summary: buildOrderSummary(),
+                    order_total: String(getCartTotal()),
+                    order_item_count: String(getCartCount())
+                })
+            }).catch(err => {
+                console.warn("API call failed, but continuing with UI update:", err);
+                return null;
+            });
+            
+            // Hiện thank you screen bất kỳ (cho dù API thành công hay không)
+            showThankYouScreen(formData);
+            
+        } catch (err) {
+            console.error("Lỗi:", err);
+            // Vẫn hiện thank you screen
+            showThankYouScreen(formData);
+        }
+    }
+});
+
+// STEP 4: Hiện màn hình cảm ơn
+function showThankYouScreen(formData) {
+    const confirmationScreen = document.getElementById('confirmationScreen');
+    const thankYouScreen = document.getElementById('thankYouScreen');
+    const thankYouOrderNumber = document.getElementById('thankYouOrderNumber');
+    
+    if (!confirmationScreen || !thankYouScreen) return;
+    
+    // Ẩn confirmation, hiện thank you
+    confirmationScreen.style.display = 'none';
+    thankYouScreen.style.display = 'block';
+    
+    // Generate order number
+    const orderNumber = 'JAGAL' + Date.now().toString().slice(-8);
+    
+    if (thankYouOrderNumber) {
+        thankYouOrderNumber.innerHTML = `
+            <strong style="font-size: 14px; color: var(--muted);">Mã đơn hàng:</strong>
+            <span style="font-family: monospace; font-weight: 700; color: var(--orange); font-size: 14px;">${orderNumber}</span>
+        `;
+    }
+    
+    // Clear cart & form
+    clearCart();
+    document.getElementById('noshOrderForm').reset();
+    
+    // Scroll to thank you
+    thankYouScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}

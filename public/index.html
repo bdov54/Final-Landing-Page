@@ -536,11 +536,140 @@
         </aside>
 
         <div class="orderForm">
-          <script src="https://js-na2.hsforms.net/forms/embed/245434646.js" defer></script>
-          <div class="hs-form-frame" data-region="na2" data-form-id="e2aa2b8a-f0f9-4b0d-823e-226349010082"
-            data-portal-id="245434646"></div>
+          <div class="orderForm__header">
+            <h3 class="orderForm__title">ĐẶT HÀNG NHẬN ƯU ĐÃI 30% 🌊</h3>
+            <p class="orderForm__sub">Chỉ mất 30 giây để mang hương vị Busan về nhà!</p>
+          </div>
+
+          <form id="noshOrderForm" class="formMain" data-step="input">
+            <div class="formRow">
+              <div class="formGroup">
+                <label>Họ</label>
+                <input type="text" id="ho" name="ho" placeholder="VD: Nguyễn" required>
+              </div>
+              <div class="formGroup">
+                <label>Tên</label>
+                <input type="text" id="ten" name="ten" placeholder="VD: An" required>
+              </div>
+            </div>
+
+            <div class="formRow">
+              <div class="formGroup">
+                <label>Email</label>
+                <input type="email" id="email" name="email" placeholder="email@cua-ban.com" required>
+              </div>
+              <div class="formGroup">
+                <label>Số điện thoại</label>
+                <input type="tel" id="phone" name="phone" placeholder="09xx xxx xxx" required>
+              </div>
+            </div>
+
+            <div class="formGroup">
+              <label>Địa chỉ giao hàng</label>
+              <textarea id="address" name="address" rows="2" placeholder="Số nhà, tên đường, Phường/Xã..."
+                required></textarea>
+            </div>
+
+            <div class="formGroup">
+              <label>Bạn thích vị nào nhất? (Chọn nhiều mục)</label>
+              <div class="flavor-selection">
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Combo 4 vị">
+                  <span>🎁 Combo 4 vị</span>
+                </label>
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Thùng “Tiệc Văn Phòng”">
+                  <span>🎁 Thùng “Tiệc Văn Phòng”</span>
+                </label>
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Spicy">
+                  <span>🌶️ Spicy</span>
+                </label>
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Peanut">
+                  <span>🥜 Peanut</span>
+                </label>
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Brown Rice">
+                  <span>🌾 Brown Rice</span>
+                </label>
+                <label class="flavor-item">
+                  <input type="checkbox" name="pref" value="Chocolate">
+                  <span>🍫 Chocolate</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="formCheckbox">
+              <input type="checkbox" id="consent_email" name="consent_email" checked>
+              <label for="consent_email">Đồng ý nhận thông tin ưu đãi mới nhất qua Email.</label>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn btn--primary btn--lg w-100 mt-3">
+              XÁC NHẬN ĐẶT HÀNG
+            </button>
+
+            <p class="formSafe">🚀 NoshProject sẽ gọi lại cho bạn trong vòng 5-10 phút.</p>
+          </form>
+
+          <!-- STEP 2: CONFIRMATION SCREEN -->
+          <div id="confirmationScreen" class="confirmationScreen" style="display: none;">
+            <div class="confirmationScreen__header">
+              <h3>Xác nhận thông tin đơn hàng</h3>
+              <p>Vui lòng kiểm tra lại thông tin trước khi hoàn tất đơn hàng</p>
+            </div>
+
+            <div class="confirmationScreen__content">
+              <div class="confirmationSection">
+                <h4>📋 Thông tin giao hàng</h4>
+                <div id="confirmCustomerInfo" class="confirmationInfo"></div>
+              </div>
+
+              <div class="confirmationSection">
+                <h4>🛒 Danh sách sản phẩm</h4>
+                <div id="confirmOrderItems" class="confirmationInfo"></div>
+              </div>
+
+              <div class="confirmationSection">
+                <h4>💰 Tổng cộng</h4>
+                <div id="confirmOrderTotal" class="confirmationInfo"></div>
+              </div>
+
+              <div class="confirmationSection">
+                <h4>😋 Hương vị yêu thích</h4>
+                <div id="confirmFlavors" class="confirmationInfo"></div>
+              </div>
+            </div>
+
+            <div class="confirmationScreen__footer">
+              <button id="backBtn" class="btn btn--ghost btn--lg w-100" style="margin-bottom: 10px;">
+                Quay lại chỉnh sửa
+              </button>
+              <button id="confirmBtn" class="btn btn--primary btn--lg w-100">
+                ✅ Xác nhận & hoàn tất đơn hàng
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3: THANK YOU SCREEN -->
+          <div id="thankYouScreen" class="thankYouScreen" style="display: none;">
+            <div class="thankYouScreen__content">
+              <div class="thankYouScreen__icon">🎉</div>
+              <h3 class="thankYouScreen__title">Cảm ơn Cháu đã ăn cùng bà</h3>
+              <p class="thankYouScreen__message">
+                Giờ bà đi chuẩn bị mẻ rong biển giòn ngon đây!
+              </p>
+              <div class="thankYouScreen__details">
+                <p id="thankYouOrderNumber" style="font-size: 14px; color: #999; margin-top: 20px;"></p>
+              </div>
+              <div class="thankYouScreen__actions">
+                <button id="continueShoppingBtn" class="btn btn--primary btn--lg w-100" style="margin-top: 24px;">
+                  🛒 Tiếp tục mua hàng
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
   </section>
 
   <footer class="footer">
